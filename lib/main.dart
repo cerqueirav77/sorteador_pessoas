@@ -29,12 +29,32 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<String> nomes = ['Guigui', 'Alcivan', 'Victor', 'Enzo Manoel', 'Andreas', 'Heitor'];
+  final List<String> todosNomes = ['Guigui', 'Alcivan', 'Victor', 'Enzo Manoel', 'Andreas', 'Heitor'];
+  List<String> nomesDisponiveis = [];
+  List<String> nomesSorteados = [];
   String nomeSorteado = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _reiniciarSorteio();
+  }
+
   void _sortearNome() {
+    if (nomesDisponiveis.isNotEmpty) {
+      setState(() {
+        int index = Random().nextInt(nomesDisponiveis.length);
+        nomeSorteado = nomesDisponiveis.removeAt(index);
+        nomesSorteados.add(nomeSorteado);
+      });
+    }
+  }
+
+  void _reiniciarSorteio() {
     setState(() {
-      nomeSorteado = nomes[Random().nextInt(nomes.length)];
+      nomesDisponiveis = List.from(todosNomes);
+      nomesSorteados.clear();
+      nomeSorteado = '';
     });
   }
 
@@ -54,13 +74,34 @@ class _MyHomePageState extends State<MyHomePage> {
               nomeSorteado,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            const SizedBox(height: 20),
+            const Text('Nomes sorteados:'),
+            Column(
+              children: nomesSorteados.map((nome) => Text(nome)).toList(),
+            ),
+            const SizedBox(height: 20),
+            const Text('Nomes disponíveis:'),
+            Column(
+              children: nomesDisponiveis.map((nome) => Text(nome)).toList(),
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sortearNome,
-        tooltip: 'Sortear',
-        child: const Icon(Icons.shuffle),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _sortearNome,
+            tooltip: 'Sortear',
+            child: const Icon(Icons.shuffle),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: _reiniciarSorteio,
+            tooltip: 'Reiniciar',
+            child: const Icon(Icons.refresh),
+          ),
+        ],
       ),
     );
   }
